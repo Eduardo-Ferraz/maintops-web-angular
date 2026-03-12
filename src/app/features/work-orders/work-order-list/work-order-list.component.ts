@@ -149,6 +149,17 @@ import {
                 </button>
               }
 
+              <!-- Start button: Scheduled → InProgress (PEND-003: endpoint pending) -->
+              @if (canStart(row)) {
+                <button
+                  mat-icon-button
+                  matTooltip="Start work order"
+                  (click)="startWorkOrder(row)"
+                >
+                  <mat-icon>play_arrow</mat-icon>
+                </button>
+              }
+
               <!-- Complete button: Scheduled or InProgress (DR-1: Pending cannot complete) -->
               @if (canComplete(row)) {
                 <button
@@ -175,7 +186,13 @@ import {
           showFirstLastButtons
         />
       } @else {
-        <p class="py-16 text-center text-gray-400">Loading work orders…</p>
+        <!-- Shimmer skeleton shown while the first query hasn't resolved yet -->
+        <div class="animate-pulse space-y-2 rounded-lg border border-gray-100 p-4">
+          <div class="h-4 w-1/4 rounded bg-gray-200"></div>
+          @for (_ of [1,2,3,4,5]; track _) {
+            <div class="h-12 rounded bg-gray-100"></div>
+          }
+        </div>
       }
     </div>
   `,
@@ -259,6 +276,11 @@ export class WorkOrderListComponent {
     return row.status === 'Scheduled' || row.status === 'InProgress';
   }
 
+  /** PEND-003: Scheduled orders can be started (Scheduled → InProgress). */
+  protected canStart(row: WorkOrderSummary): boolean {
+    return row.status === 'Scheduled';
+  }
+
   // ── Pagination handler ────────────────────────────────────────────────────────
   protected onPageChange(event: PageEvent): void {
     this.page.set(event.pageIndex + 1);
@@ -304,5 +326,12 @@ export class WorkOrderListComponent {
           .completeWorkOrder(row.id)
           .subscribe(() => this.refresh$.next());
       });
+  }
+
+  /** PEND-003: will return 404 until the backend exposes PATCH /work-orders/{id}/start. */
+  protected startWorkOrder(row: WorkOrderSummary): void {
+    this.workOrderService
+      .startWorkOrder(row.id)
+      .subscribe(() => this.refresh$.next());
   }
 }

@@ -15,6 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -164,13 +165,14 @@ export class LoginComponent {
     if (this.form.invalid) return;
     this.loading.set(true);
 
-    // TODO Phase 4: replace with real HTTP call once a login endpoint exists.
-    // const { email, password } = this.form.getRawValue();
-    // this.authService.loginWithCredentials(email, password)
-    //   .pipe(finalize(() => this.loading.set(false)))
-    //   .subscribe(() => this.redirectAfterLogin());
-
-    this.loading.set(false);
+    const { email, password } = this.form.getRawValue();
+    this.authService
+      .loginWithCredentials(email, password)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: () => this.redirectAfterLogin(),
+        // 401 (wrong credentials) is handled centrally by errorInterceptor.
+      });
   }
 
   protected devLogin(token: string): void {

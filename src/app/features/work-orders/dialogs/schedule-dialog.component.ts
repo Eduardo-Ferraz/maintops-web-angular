@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Component, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import {
@@ -98,6 +99,13 @@ const endAfterStart: ValidatorFn = (
             <mat-error>End date must be after start date.</mat-error>
           }
         </mat-form-field>
+
+        <!-- Inline API error (e.g. DR-3 high-criticality overlap) -->
+        @if (apiError()) {
+          <p class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">
+            {{ apiError() }}
+          </p>
+        }
       </form>
     </mat-dialog-content>
 
@@ -124,7 +132,8 @@ export class ScheduleDialogComponent {
   protected readonly data: ScheduleDialogData = inject(MAT_DIALOG_DATA);
   private readonly workOrderService = inject(WorkOrderService);
 
-  protected readonly loading = signal(false);
+  protected readonly loading  = signal(false);
+  protected readonly apiError = signal<string | null>(null);
 
   protected readonly form = new FormGroup(
     {
@@ -137,6 +146,7 @@ export class ScheduleDialogComponent {
   protected schedule(): void {
     if (this.form.invalid) return;
     this.loading.set(true);
+    this.apiError.set(null);
 
     const { startDate, endDate } = this.form.value;
     this.workOrderService
@@ -145,8 +155,18 @@ export class ScheduleDialogComponent {
         endDate:   endDate!.toISOString(),
       })
       .pipe(finalize(() => this.loading.set(false)))
-      .subscribe((response: ScheduleWorkOrderResponse) => {
-        this.dialogRef.close(response);
+      .subscribe({
+        next: (response: ScheduleWorkOrderResponse) => this.dialogRef.close(response),
+        error: (err: HttpErrorResponse) => {
+          // 422 = domain rule violation (e.g. DR-3 high-criticality overlap).
+          // The errorInterceptor already shows a snackbar; show a persistent
+          // inline message so the user knows what to fix while the dialog is open.
+          if (err.status === 422) {
+            this.apiError.set(
+              (err.error as { detail?: string })?.detail ?? 'Business rule violation.',
+            );
+          }
+        },
       });
   }
 }

@@ -1,2 +1,18 @@
 /* Tailwind CSS v4 — processed by PostCSS (@tailwindcss/postcss), not Sass. */
 @import "tailwindcss";
+
+/*
+ * Tailwind–Material Design 3 color bridge (PEND-008 resolved).
+ * Maps Material's CSS tokens → Tailwind color names so classes like
+ * `text-primary`, `bg-surface`, `text-error` resolve correctly.
+ *
+ * Note: `/10` opacity modifiers do not work with CSS-variable-backed colors.
+ * Use color-mix() arbitrary values for tinted backgrounds:
+ *   bg-[color-mix(in_srgb,var(--mat-sys-primary)_10%,transparent)]
+ */
+@theme {
+  --color-primary:    var(--mat-sys-primary);
+  --color-on-surface: var(--mat-sys-on-surface);
+  --color-surface:    var(--mat-sys-surface);
+  --color-error:      var(--mat-sys-error);
+}

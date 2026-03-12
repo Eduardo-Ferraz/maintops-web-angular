@@ -106,7 +106,18 @@ interface DashboardData {
           }
         </div>
       } @else {
-        <p class="py-16 text-center text-gray-400">Loading dashboard data…</p>
+        <!-- Shimmer skeleton shown while the first poll hasn't resolved yet -->
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-4 animate-pulse">
+          @for (_ of [1,2,3,4]; track _) {
+            <div class="h-28 rounded-lg bg-gray-200"></div>
+          }
+        </div>
+        <div class="animate-pulse space-y-2 rounded-lg border border-gray-100 p-4">
+          <div class="h-4 w-1/3 rounded bg-gray-200"></div>
+          @for (_ of [1,2,3]; track _) {
+            <div class="h-10 rounded bg-gray-100"></div>
+          }
+        </div>
       }
     </div>
   `,

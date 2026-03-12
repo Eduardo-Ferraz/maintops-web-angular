@@ -7,6 +7,7 @@ import {
   PagedResult,
   ScheduleWorkOrderRequest,
   ScheduleWorkOrderResponse,
+  StartWorkOrderResponse,
   SubmitWorkOrderCommand,
   SubmitWorkOrderResponse,
   WorkOrdersQuery,
@@ -95,6 +96,20 @@ export class WorkOrderService {
     // The backend expects no request body — only the route id matters.
     return this.http.patch<CompleteWorkOrderResponse>(
       `${this.base}/${id}/complete`,
+      null,
+    );
+  }
+
+  /**
+   * PATCH /work-orders/{id}/start
+   * Transitions a Scheduled work order to InProgress.
+   *
+   * NOTE: This endpoint does not exist yet on the backend (PEND-003).
+   * The call will receive a 404 until the backend exposes the route.
+   */
+  startWorkOrder(id: string): Observable<StartWorkOrderResponse> {
+    return this.http.patch<StartWorkOrderResponse>(
+      `${this.base}/${id}/start`,
       null,
     );
   }

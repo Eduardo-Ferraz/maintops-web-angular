@@ -60,3 +60,9 @@ export interface CompleteWorkOrderResponse {
   id: string;
   status: WorkOrderStatus;
 }
+
+// ─── PATCH /work-orders/{id}/start (PEND-003 — backend endpoint pending) ────
+export interface StartWorkOrderResponse {
+  id: string;
+  status: WorkOrderStatus; // expected: 'InProgress'
+}

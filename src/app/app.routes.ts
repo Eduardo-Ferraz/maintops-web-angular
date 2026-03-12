@@ -36,6 +36,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
 
-  // Fallback — redirect unknown paths to login
-  { path: '**', redirectTo: 'login' },
+  // Fallback — authenticated users land on dashboard; authGuard redirects
+  // unauthenticated users from /dashboard to /login?returnUrl=... (PEND-009 fixed)
+  { path: '**', redirectTo: 'dashboard' },
 ];
