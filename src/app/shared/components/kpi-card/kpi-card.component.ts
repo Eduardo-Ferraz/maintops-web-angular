@@ -15,11 +15,11 @@ import { MatIconModule } from '@angular/material/icon';
   template: `
     <mat-card appearance="outlined" class="h-full">
       <mat-card-content class="flex items-center gap-4 p-6">
-        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10">
-          <mat-icon class="text-primary">{{ icon() }}</mat-icon>
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-50">
+          <mat-icon class="text-indigo-600">{{ icon() }}</mat-icon>
         </div>
         <div class="min-w-0">
-          <p class="truncate text-sm text-on-surface/60">{{ label() }}</p>
+          <p class="truncate text-sm text-gray-500">{{ label() }}</p>
           <p class="text-3xl font-bold leading-none">{{ value() }}</p>
         </div>
       </mat-card-content>
